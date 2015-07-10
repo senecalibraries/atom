@@ -399,6 +399,36 @@ EOF;
       /* import logic to execute before saving information object */
       'preSaveLogic' => function(&$self)
       {
+        // port old create date column data to new more generalized columns
+        if ((isset($self->rowStatusVars['creatorDates']) && $self->rowStatusVars['creatorDates'])
+          || (isset($self->rowStatusVars['creatorDatesStart']) && $self->rowStatusVars['creatorDatesStart'])
+          || (isset($self->rowStatusVars['creatorDatesEnd']) && $self->rowStatusVars['creatorDatesEnd'])
+          || (isset($self->rowStatusVars['creatorDateNotes']) && $self->rowStatusVars['creatorDateNotes']))
+        {
+          $eventTypes = (empty($self->rowStatusVars['eventTypes'])) ? array() : $self->rowStatusVars['eventTypes'];
+          $eventDates = (empty($self->rowStatusVars['eventDates'])) ? array() : $self->rowStatusVars['eventDates'];
+          $eventStartDates = (empty($self->rowStatusVars['eventStartDates'])) ? array() : $self->rowStatusVars['eventStartDates'];
+          $eventEndDates = (empty($self->rowStatusVars['eventEndDates'])) ? array() : $self->rowStatusVars['eventEndDates'];
+          $eventDescriptions = (empty($self->rowStatusVars['eventDescriptions'])) ? array() : $self->rowStatusVars['eventDescriptions'];
+
+          // determine the number of creation events being added
+          $numberOfCreateEvents = max(count($self->rowStatusVars['creatorDates']), count($self->rowStatusVars['creatorDatesStart']),
+            count($self->rowStatusVars['creatorDatesEnd']), count($self->rowStatusVars['creatorDateNotes']));
+
+          // for each creation event, add to the event types
+          for ($createEventNumber = 1; $createEventNumber <= $numberOfCreateEvents; $createEventNumber++)
+          {
+            $eventTypes[] = 'Creation';
+          }
+
+          // add creation date data to the event-related columns
+          $self->rowStatusVars['eventTypes'] = $eventTypes;
+          $self->rowStatusVars['eventDates'] = array_merge($eventDates, $self->rowStatusVars['creatorDates']);
+          $self->rowStatusVars['eventStartDates'] = array_merge($eventStartDates, $self->rowStatusVars['creatorDatesStart']);
+          $self->rowStatusVars['eventEndDates'] = array_merge($eventEndDates, $self->rowStatusVars['creatorDatesEnd']);
+          $self->rowStatusVars['eventDescriptions'] = array_merge($eventDescriptions, $self->rowStatusVars['creatorDateNotes']);
+        }
+
         // set repository
         if (isset($self->rowStatusVars['repository']) && $self->rowStatusVars['repository'])
         {
