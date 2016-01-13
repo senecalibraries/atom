@@ -1,0 +1,98 @@
+---
+
+elasticsearch:
+  image: "elasticsearch:1.7"
+  command: "elasticsearch -Des.node.name=TestNode -Des.network.host=0.0.0.0"
+  expose:
+    - "9200"
+    - "9300"
+
+percona:
+  image: "percona:5.6"
+  environment:
+    - "MYSQL_ROOT_PASSWORD=my-secret-pw"
+    - "MYSQL_DATABASE=atom"
+    - "MYSQL_USER=atom"
+    - "MYSQL_PASSWORD=atom_12345"
+  expose:
+    - "3306"
+
+memcached:
+  image: "memcached"
+  command: "-p 11211 -m 128 -u memcache"
+  expose:
+    - "11211"
+
+gearmand:
+  image: "sevein/gearmand"
+  # command: "--queue-type=libmemcached --libmemcached-servers=memcached:11211 --listen=0.0.0.0 --port=4730 --log-file=stderr --verbose=DEBUG"
+  command: "--queue-type=builtin --listen=0.0.0.0 --port=4730 --log-file=stderr"
+  expose:
+    - "4730"
+  links:
+    - "memcached"
+
+atom_uploads:
+  image: "tianon/true"
+  volumes:
+    - "/atom/src/uploads"
+
+atom:
+  image: "artefactual/atom:qa-2.3.x"
+  links:
+    - "gearmand"
+    - "memcached"
+    - "percona"
+    - "elasticsearch"
+  volumes:
+    - "../:/atom/src"
+  volumes_from:
+    - "atom_uploads"
+  environment:
+    - "ATOM_READ_ONLY=off"
+    - "ATOM_DEBUG_IP=192.168.1.1"
+    - "ATOM_ES_HOSTS=elasticsearch:9200"
+    - "ATOM_DB_DSN=mysql:host=percona,port=3306,charset=utf8,dbname=atom"
+    - "ATOM_DB_HOSTNAME=percona"
+    - "ATOM_DB_PORT=3306"
+    - "ATOM_DB_NAME=atom"
+    - "ATOM_DB_USERNAME=atom"
+    - "ATOM_DB_PASSWORD=atom_12345"
+    - "PHPRC=/atom/php.ini"
+
+atom_worker:
+  image: "artefactual/atom:qa-2.3.x"
+  command: "worker"
+  links:
+    - "gearmand"
+    - "memcached"
+    - "percona"
+    - "elasticsearch"
+  volumes:
+    - "../:/atom/src"
+  volumes_from:
+    - "atom_uploads"
+  environment:
+    - "ATOM_READ_ONLY=off"
+    - "ATOM_DEBUG_IP=192.168.1.1"
+    - "ATOM_ES_HOSTS=elasticsearch:9200"
+    - "ATOM_DB_DSN=mysql:host=percona,port=3306,charset=utf8,dbname=atom"
+    - "ATOM_DB_HOSTNAME=percona"
+    - "ATOM_DB_PORT=3306"
+    - "ATOM_DB_NAME=atom"
+    - "ATOM_DB_USERNAME=atom"
+    - "ATOM_DB_PASSWORD=atom_12345"
+    - "PHPRC=/atom/php.ini"
+    - "FOP_HOME=/usr/share/fop-1.0"
+
+nginx:
+  image: "nginx:latest"
+  links:
+    - "atom"
+  ports:
+    - "8000:80"
+  volumes:
+    - "../:/atom/src:ro"
+    - "./etc/nginx/prod.conf:/etc/nginx/nginx.conf:ro"
+  volumes_from:
+    - "atom_uploads"

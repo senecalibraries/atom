@@ -83,7 +83,7 @@ EOF;
     {
       if (!class_exists($ability))
       {
-        $this->log("Ability not defined: $ability. Please ensure the job is in the lib/task/job directory or that the plugin is enabled.");
+        $this->log("Ability not defined: $ability. Please ensure the job is in the lib/task/jobs directory or that the plugin is enabled.");
 
         continue;
       }
