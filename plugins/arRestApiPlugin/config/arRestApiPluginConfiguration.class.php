@@ -79,6 +79,13 @@ class arRestApiPluginConfiguration extends sfPluginConfiguration
     $this->addRoute('POST', '/api/digitalobjects', array(
       'module' => 'api',
       'action' => 'digitalobjectsCreate'));
+
+    /**
+     * Users and authentication
+     */
+    $this->addRoute('GET,POST,DELETE', '/api/users/authenticate', array(
+      'module' => 'api',
+      'action' => 'usersAuthenticate'));
   }
 
   protected function addRoute($method, $pattern, array $options = array())
