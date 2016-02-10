@@ -35,31 +35,6 @@ RUN apk update && \
         make \
         bash
 
-# Temporary hack for php-memcache (before #5064 fix)
-# See https://bugs.alpinelinux.org/issues/5064
-# RUN apk add php-dev autoconf build-base zlib-dev && \
-#     cd / && \
-#     wget https://pecl.php.net/get/memcache-3.0.8.tgz && \
-#     tar xvvzf memcache-3.0.8.tgz && \
-#     cd memcache-3.0.8 && \
-#     phpize && \
-#     wget https://raw.githubusercontent.com/pld-linux/php-pecl-memcache/master/memcache-faulty-inline.diff && \
-#     patch -p1 < memcache-faulty-inline.diff && \
-#     ./configure --prefix=/usr && \
-#     make && \
-#     make install && \
-#     echo "extension=memcache.so" > /etc/php/conf.d/memcache.ini && \
-#     rm -rf /memcache-3.0.8 /memcache-3.0.8.tar.gz /package.xml && \
-#     apk del php-dev autoconf build-base zlib-dev
-
-# Temporary hack for php-memcache (with #5064 solved in edge)
-# See https://bugs.alpinelinux.org/issues/5064
-RUN sed -i -e 's/v3\.3/edge/g' /etc/apk/repositories && \
-    apk update && \
-    apk del php-memcache && \
-    apk add php-memcache && \
-    sed -i -e 's/edge/v3\.3/g' /etc/apk/repositories
-
 RUN rm -rf /var/cache/apk/*
 
 RUN npm install -g "less@<2.0.0"
