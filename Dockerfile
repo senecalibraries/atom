@@ -27,6 +27,7 @@ RUN apk update && \
         php-zip \
         ca-certificates \
         git \
+        openjdk8-jre-base \
         ffmpeg \
         imagemagick \
         ghostscript \
@@ -36,6 +37,12 @@ RUN apk update && \
         bash
 
 RUN rm -rf /var/cache/apk/*
+
+ENV FOP_VERSION 2.1
+ENV FOP_HOME /usr/share/fop-${FOP_VERSION}
+ENV FOP_URL https://archive.apache.org/dist/xmlgraphics/fop/binaries/fop-${FOP_VERSION}-bin.tar.gz
+RUN curl ${FOP_URL} | tar xz -C /usr/share && \
+    ln -sf ${FOP_HOME}/fop /usr/local/bin/fop
 
 RUN npm install -g "less@<2.0.0"
 
