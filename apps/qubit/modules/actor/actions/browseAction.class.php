@@ -105,14 +105,14 @@ class ActorBrowseAction extends DefaultBrowseAction
     // Set filter
     if (0 < count($this->search->filterBool->toArray()))
     {
-      $this->search->query->setFilter($this->search->filterBool);
+      $this->search->query->setPostFilter($this->search->filterBool);
     }
 
     $resultSet = QubitSearch::getInstance()->index->getType('QubitActor')->search($this->search->query);
 
     $this->pager = new QubitSearchPager($resultSet);
     $this->pager->setPage($request->page ? $request->page : 1);
-    $this->pager->setMaxPerPage($request->limit);
+    $this->pager->setMaxPerPage($this->limit);
     $this->pager->init();
 
     $this->populateFacets($resultSet);

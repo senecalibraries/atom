@@ -108,11 +108,14 @@ class exportBulkTask extends exportBulkBaseTask
       }
       else
       {
-        $filename = $this->generateSortableFilename($row['id'], 'xml', $options['format']);
+        $filename = $this->generateSortableFilename($resource, 'xml', $options['format']);
         $filePath = sprintf('%s/%s', $arguments['path'], $filename);
       }
 
-      file_put_contents($filePath, $xml);
+      if (false === file_put_contents($filePath, $xml))
+      {
+        throw new sfException("Cannot write to path: $filePath");
+      }
 
       $this->indicateProgress($options['items-until-update']);
 

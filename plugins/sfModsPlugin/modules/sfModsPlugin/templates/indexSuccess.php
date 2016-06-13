@@ -30,37 +30,6 @@
 
   <?php echo get_partial('informationobject/actionIcons', array('resource' => $resource)) ?>
 
-  <?php if (false): ?>
-  <?php $repository = $resource->getRepository(array('inherit' => true)) ?>
-  <?php if (null !== $repository && null !== ($contactInformations = $repository->contactInformations)): ?>
-    <section>
-
-      <h4><?php echo __('How to access to this content?') ?></h4>
-
-      <div class="content">
-        <?php echo __('Contact the archivist at %1%', array('%1%' => $repository->__toString())) ?>
-        <a href="#contact-modal" class="btn btn-small" role="button" data-target="#contact-modal" data-backdrop="true" data-toggle="modal"><?php echo __('Show details') ?></a>
-      </div>
-
-      <div class="modal hide fade" id="contact-modal" tabindex="-1" role="dialog" aria-labelledby="contact-modal-label" aria-hidden="true">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h3 id="contact-modal-label"><?php echo __('How to access to this content?') ?></h3>
-        </div>
-        <div class="modal-body">
-         <?php foreach ($contactInformations as $contactItem): ?>
-            <?php echo get_partial('contactinformation/contactInformation', array('contactInformation' => $contactItem)) ?>
-          <?php endforeach; ?>
-        </div>
-        <div class="modal-footer">
-          <button class="btn" data-dismiss="modal" aria-hidden="true"><?php echo __('Close') ?></button>
-        </div>
-      </div>
-
-    </section>
-  <?php endif; ?>
-  <?php endif; ?>
-
   <?php echo get_partial('informationobject/subjectAccessPoints', array('resource' => $resource, 'sidebar' => true)) ?>
 
   <?php echo get_partial('informationobject/nameAccessPoints', array('resource' => $resource, 'sidebar' => true)) ?>
@@ -81,7 +50,7 @@
 
 <section id="elementsArea">
 
-  <?php echo link_to_if(SecurityPriviliges::editCredentials($sf_user, 'informationObject'), '<h2>'.__('Elements area').'</h2>', array($resource, 'module' => 'informationobject', 'action' => 'edit'), array('anchor' => 'mainArea', 'title' => __('Edit elements area'))) ?>
+  <?php echo link_to_if(SecurityPrivileges::editCredentials($sf_user, 'informationObject'), '<h2>'.__('Elements area').'</h2>', array($resource, 'module' => 'informationobject', 'action' => 'edit'), array('anchor' => 'mainArea', 'title' => __('Edit elements area'))) ?>
 
   <?php if (0 < count($resource->digitalObjects)): ?>
     <?php echo get_component('digitalobject', 'show', array('link' => $digitalObjectLink, 'resource' => $resource->digitalObjects[0], 'usageType' => QubitTerm::REFERENCE_ID)) ?>

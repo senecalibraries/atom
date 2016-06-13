@@ -118,7 +118,16 @@ class InformationObjectAddDigitalObjectAction extends sfAction
     }
     else if (null !== $this->form->getValue('url'))
     {
-      $digitalObject->importFromURI($this->form->getValue('url'));
+      // Catch errors trying to download remote resource
+      try
+      {
+        $digitalObject->importFromURI($this->form->getValue('url'));
+      }
+      catch (sfException $e)
+      {
+        // Log download exception
+        $this->logMessage($e->getMessage, 'err');
+      }
     }
 
     $this->resource->digitalObjects[] = $digitalObject;

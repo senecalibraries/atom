@@ -39,8 +39,8 @@ class Qubit
   // support zero day or zero month
   public static function renderDate($value)
   {
-    // Natural number, trim leading zeros
-    $natural = '0*([1-9]\d*)';
+    // Natural number
+    $natural = '([1-9]\d*)';
 
     // Zero and separator, trim leading zeros
     $zero = '0*(0[-\/])';
@@ -284,5 +284,29 @@ class Qubit
     $dom->loadXML($xml);
 
     return $dom->saveXML();
+  }
+
+  /**
+   * Similar to the one in sfWebRequest but will check for a list of headers
+   * and return the first match or a fallback value that defaults to null.
+   */
+  public static function getHttpHeader($names, $default = null)
+  {
+    $request = sfContext::getInstance()->getRequest();
+
+    if (!is_array($names))
+    {
+      $names = array($names);
+    }
+
+    foreach ($names as $item)
+    {
+      if (null !== $value = $request->getHttpHeader($item))
+      {
+        return $value;
+      }
+    }
+
+    return $default;
   }
 }

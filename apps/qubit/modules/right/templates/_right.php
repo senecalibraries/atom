@@ -1,6 +1,6 @@
 <div class="field">
   <h3><?php echo __('Related right') ?></h3>
-  <?php if (QubitAcl::check($informationObject, 'update')): ?>
+  <?php if (QubitAcl::check($relatedObject, 'update')): ?>
     <a href="<?php echo url_for(array('module' => 'right', 'action' => 'edit', 'slug' => $resource->slug)) ?>">&nbsp;Edit</a> |
     <a href="<?php echo url_for(array('module' => 'right', 'action' => 'delete', 'slug' => $resource->slug)) ?>"  class="deleteRightBasis">Delete</a>
   <?php endif; ?>
@@ -32,7 +32,7 @@
 
       <?php echo render_show(__('Copyright status'), render_value($resource->copyrightStatus)) ?>
 
-      <?php echo render_show(__('Copyright status date'), render_value($resource->copyrightStatusDate)) ?>
+      <?php echo render_show(__('Copyright status determination date'), render_value($resource->copyrightStatusDate)) ?>
 
       <?php echo render_show(__('Copyright jurisdiction'), render_value(format_country($resource->copyrightJurisdiction))) ?>
 

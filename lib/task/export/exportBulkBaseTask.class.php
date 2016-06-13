@@ -88,14 +88,25 @@ abstract class exportBulkBaseTask extends sfBaseTask
 
   public static function includeXmlExportClassesAndHelpers()
   {
-    $appRoot = dirname(__FILE__) .'/../../..';
+    $appRoot = sfConfig::get('sf_root_dir');
 
-    include($appRoot .'/plugins/sfEadPlugin/lib/sfEadPlugin.class.php');
-    include($appRoot .'/vendor/symfony/lib/helper/UrlHelper.php');
-    include($appRoot .'/vendor/symfony/lib/helper/I18NHelper.php');
-    include($appRoot .'/vendor/FreeBeerIso639Map.php');
-    include($appRoot .'/vendor/symfony/lib/helper/EscapingHelper.php');
-    include($appRoot .'/lib/helper/QubitHelper.php');
+    $includes = array(
+      '/plugins/sfEadPlugin/lib/sfEadPlugin.class.php',
+      '/plugins/sfModsPlugin/lib/sfModsPlugin.class.php',
+      '/plugins/sfModsPlugin/lib/sfModsPlugin.class.php',
+      '/plugins/sfIsaarPlugin/lib/sfIsaarPlugin.class.php',
+      '/plugins/sfEacPlugin/lib/sfEacPlugin.class.php',
+      '/vendor/symfony/lib/helper/UrlHelper.php',
+      '/vendor/symfony/lib/helper/I18NHelper.php',
+      '/vendor/FreeBeerIso639Map.php',
+      '/vendor/symfony/lib/helper/EscapingHelper.php',
+      '/lib/helper/QubitHelper.php'
+    );
+
+    foreach ($includes as $include)
+    {
+      include_once $appRoot.$include;
+    }
   }
 
   public static function captureResourceExportTemplateOutput($resource, $format, $options)
@@ -136,10 +147,22 @@ abstract class exportBulkBaseTask extends sfBaseTask
     return $output;
   }
 
-  public static function generateSortableFilename($objectId, $extension, $formatAbbreviation)
+  /**
+   * Generate a suitable file name for export files.
+   *
+   * @param $resource  The information object we're exporting
+   * @param $extension  The file extension (e.g. csv, xml)
+   * @param $formatAbbreviation  The type of export format (e.g. ead, eac, mods)
+   *
+   * @return string  The generated filename based on the format, info object id, slug, and extension
+   */
+  public static function generateSortableFilename($resource, $extension, $formatAbbreviation)
   {
+    $MAX_SLUG_CHARS = 200;
+
     // Pad ID with zeros so filenames can be sorted in creation order for imports
-    return sprintf('%s_%s.%s', $formatAbbreviation, str_pad($objectId, 10, '0', STR_PAD_LEFT), $extension);
+    return sprintf('%s_%s_%s.%s', $formatAbbreviation, str_pad($resource->id, 10, '0', STR_PAD_LEFT),
+                   substr($resource->slug, 0, $MAX_SLUG_CHARS), $extension);
   }
 
   protected function indicateProgress($itemsUntilUpdate)
@@ -159,7 +182,7 @@ abstract class exportBulkBaseTask extends sfBaseTask
       $query = 'SELECT i.lft, i.rgt, i.id FROM information_object i INNER JOIN slug s ON i.id=s.object_id WHERE s.slug = ?';
       $slug = QubitPdo::fetchOne($query, array($options['single-slug']));
 
-      if (null === $slug)
+      if (false === $slug)
       {
         throw new sfException('Slug '.$options['single-slug'].' not found.');
       }

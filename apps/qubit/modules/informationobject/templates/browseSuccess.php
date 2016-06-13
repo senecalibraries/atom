@@ -1,4 +1,9 @@
-<?php decorate_with('layout_2col') ?>
+<?php if (isset($pager) && $pager->hasResults()): ?>
+  <?php decorate_with('layout_2col') ?>
+<?php else: ?>
+  <?php decorate_with('layout_1col') ?>
+<?php endif; ?>
+
 <?php use_helper('Date') ?>
 
 <?php slot('title') ?>
@@ -6,7 +11,13 @@
 
   <div class="multiline-header">
     <?php echo image_tag('/images/icons-large/icon-archival.png', array('alt' => '')) ?>
-    <h1 aria-describedby="results-label"><?php echo __('Showing %1% results', array('%1%' => $pager->getNbResults())) ?></h1>
+    <h1 aria-describedby="results-label">
+      <?php if (isset($pager) && $pager->hasResults()): ?>
+        <?php echo __('Showing %1% results', array('%1%' => $pager->getNbResults())) ?>
+      <?php else: ?>
+        <?php echo __('No results found') ?>
+      <?php endif; ?>
+    </h1>
     <span class="sub" id="results-label"><?php echo sfConfig::get('app_ui_label_informationobject') ?></span>
   </div>
 <?php end_slot() ?>
@@ -17,96 +28,102 @@
   </div>
 <?php endif; ?>
 
-<?php slot('sidebar') ?>
-  <section id="facets">
+<?php if (isset($pager) && $pager->hasResults()): ?>
 
-    <div class="visible-phone facets-header">
-      <a class="x-btn btn-wide">
-        <i class="icon-filter"></i>
-        <?php echo __('Filters') ?>
-      </a>
-    </div>
+  <?php slot('sidebar') ?>
 
-    <div class="content">
+    <section id="facets">
 
-      <h2><?php echo sfConfig::get('app_ui_label_facetstitle') ?></h2>
+      <div class="visible-phone facets-header">
+        <a class="x-btn btn-wide">
+          <i class="fa fa-filter"></i>
+          <?php echo __('Filters') ?>
+        </a>
+      </div>
 
-      <?php echo get_partial('search/facetLanguage', array(
-        'target' => '#facet-languages',
-        'label' => __('Language'),
-        'facet' => 'languages',
-        'pager' => $pager,
-        'filters' => $search->filters)) ?>
+      <div class="content">
 
-      <?php echo get_partial('search/facet', array(
-        'target' => '#facet-collection',
-        'label' => __('Part of'),
-        'facet' => 'collection',
-        'pager' => $pager,
-        'filters' => $search->filters)) ?>
+        <h2><?php echo sfConfig::get('app_ui_label_facetstitle') ?></h2>
 
-      <?php if (sfConfig::get('app_multi_repository')): ?>
-        <?php echo get_partial('search/facet', array(
-          'target' => '#facet-repository',
-          'label' => sfConfig::get('app_ui_label_repository'),
-          'facet' => 'repos',
+        <?php echo get_partial('search/facetLanguage', array(
+          'target' => '#facet-languages',
+          'label' => __('Language'),
+          'facet' => 'languages',
           'pager' => $pager,
           'filters' => $search->filters)) ?>
-      <?php endif; ?>
 
-      <?php echo get_partial('search/facet', array(
-        'target' => '#facet-names',
-        'label' => sfConfig::get('app_ui_label_creator'),
-        'facet' => 'creators',
-        'pager' => $pager,
-        'filters' => $search->filters)) ?>
+        <?php echo get_partial('search/facet', array(
+          'target' => '#facet-collection',
+          'label' => __('Part of'),
+          'facet' => 'collection',
+          'pager' => $pager,
+          'filters' => $search->filters)) ?>
 
-      <?php echo get_partial('search/facet', array(
-        'target' => '#facet-names',
-        'label' => sfConfig::get('app_ui_label_name'),
-        'facet' => 'names',
-        'pager' => $pager,
-        'filters' => $search->filters)) ?>
+        <?php if (sfConfig::get('app_multi_repository')): ?>
+          <?php echo get_partial('search/facet', array(
+            'target' => '#facet-repository',
+            'label' => sfConfig::get('app_ui_label_repository'),
+            'facet' => 'repos',
+            'pager' => $pager,
+            'filters' => $search->filters)) ?>
+        <?php endif; ?>
 
-      <?php echo get_partial('search/facet', array(
-        'target' => '#facet-places',
-        'label' => sfConfig::get('app_ui_label_place'),
-        'facet' => 'places',
-        'pager' => $pager,
-        'filters' => $search->filters)) ?>
+        <?php echo get_partial('search/facet', array(
+          'target' => '#facet-names',
+          'label' => sfConfig::get('app_ui_label_creator'),
+          'facet' => 'creators',
+          'pager' => $pager,
+          'filters' => $search->filters)) ?>
 
-      <?php echo get_partial('search/facet', array(
-        'target' => '#facet-subjects',
-        'label' => sfConfig::get('app_ui_label_subject'),
-        'facet' => 'subjects',
-        'pager' => $pager,
-        'filters' => $search->filters)) ?>
+        <?php echo get_partial('search/facet', array(
+          'target' => '#facet-names',
+          'label' => sfConfig::get('app_ui_label_name'),
+          'facet' => 'names',
+          'pager' => $pager,
+          'filters' => $search->filters)) ?>
 
-      <?php echo get_partial('search/facet', array(
-        'target' => '#facet-genres',
-        'label' => sfConfig::get('app_ui_label_genre'),
-        'facet' => 'genres',
-        'pager' => $pager,
-        'filters' => $search->filters)) ?>
+        <?php echo get_partial('search/facet', array(
+          'target' => '#facet-places',
+          'label' => sfConfig::get('app_ui_label_place'),
+          'facet' => 'places',
+          'pager' => $pager,
+          'filters' => $search->filters)) ?>
 
-      <?php echo get_partial('search/facet', array(
-        'target' => '#facet-levelOfDescription',
-        'label' => __('Level of description'),
-        'facet' => 'levels',
-        'pager' => $pager,
-        'filters' => $search->filters)) ?>
+        <?php echo get_partial('search/facet', array(
+          'target' => '#facet-subjects',
+          'label' => sfConfig::get('app_ui_label_subject'),
+          'facet' => 'subjects',
+          'pager' => $pager,
+          'filters' => $search->filters)) ?>
 
-      <?php echo get_partial('search/facet', array(
-        'target' => '#facet-mediaTypes',
-        'label' => sfConfig::get('app_ui_label_mediatype'),
-        'facet' => 'mediatypes',
-        'pager' => $pager,
-        'filters' => $search->filters)) ?>
+        <?php echo get_partial('search/facet', array(
+          'target' => '#facet-genres',
+          'label' => sfConfig::get('app_ui_label_genre'),
+          'facet' => 'genres',
+          'pager' => $pager,
+          'filters' => $search->filters)) ?>
 
-    </div>
+        <?php echo get_partial('search/facet', array(
+          'target' => '#facet-levelOfDescription',
+          'label' => __('Level of description'),
+          'facet' => 'levels',
+          'pager' => $pager,
+          'filters' => $search->filters)) ?>
 
-  </section>
-<?php end_slot() ?>
+        <?php echo get_partial('search/facet', array(
+          'target' => '#facet-mediaTypes',
+          'label' => sfConfig::get('app_ui_label_mediatype'),
+          'facet' => 'mediatypes',
+          'pager' => $pager,
+          'filters' => $search->filters)) ?>
+
+      </div>
+
+    </section>
+
+  <?php end_slot() ?>
+
+<?php endif; ?>
 
 <?php slot('before-content') ?>
 
@@ -117,7 +134,7 @@
         <?php echo render_title($repos) ?>
         <?php $params = $sf_data->getRaw('sf_request')->getGetParameters() ?>
         <?php unset($params['repos']) ?>
-        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="icon-remove"></i></a>
+        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="fa fa-times"></i></a>
       </span>
     <?php endif; ?>
 
@@ -126,7 +143,7 @@
         <?php echo $collection->__toString() ?>
         <?php $params = $sf_data->getRaw('sf_request')->getGetParameters() ?>
         <?php unset($params['collection']) ?>
-        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="icon-remove"></i></a>
+        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="fa fa-times"></i></a>
       </span>
     <?php endif; ?>
 
@@ -135,7 +152,7 @@
         <?php echo $creators->__toString() ?>
         <?php $params = $sf_data->getRaw('sf_request')->getGetParameters() ?>
         <?php unset($params['creators']) ?>
-        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="icon-remove"></i></a>
+        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="fa fa-times"></i></a>
       </span>
     <?php endif; ?>
 
@@ -144,7 +161,7 @@
         <?php echo $names->__toString() ?>
         <?php $params = $sf_data->getRaw('sf_request')->getGetParameters() ?>
         <?php unset($params['names']) ?>
-        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="icon-remove"></i></a>
+        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="fa fa-times"></i></a>
       </span>
     <?php endif; ?>
 
@@ -153,7 +170,7 @@
         <?php echo $places->__toString() ?>
         <?php $params = $sf_data->getRaw('sf_request')->getGetParameters() ?>
         <?php unset($params['places']) ?>
-        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="icon-remove"></i></a>
+        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="fa fa-times"></i></a>
       </span>
     <?php endif; ?>
 
@@ -162,7 +179,7 @@
         <?php echo $levels->__toString() ?>
         <?php $params = $sf_data->getRaw('sf_request')->getGetParameters() ?>
         <?php unset($params['levels']) ?>
-        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="icon-remove"></i></a>
+        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="fa fa-times"></i></a>
       </span>
     <?php endif; ?>
 
@@ -171,7 +188,7 @@
         <?php echo $subjects->__toString() ?>
         <?php $params = $sf_data->getRaw('sf_request')->getGetParameters() ?>
         <?php unset($params['subjects']) ?>
-        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="icon-remove"></i></a>
+        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="fa fa-times"></i></a>
       </span>
     <?php endif; ?>
 
@@ -180,7 +197,7 @@
         <?php echo $mediatypes->__toString() ?>
         <?php $params = $sf_data->getRaw('sf_request')->getGetParameters() ?>
         <?php unset($params['mediatypes']) ?>
-        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="icon-remove"></i></a>
+        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="fa fa-times"></i></a>
       </span>
     <?php endif; ?>
 
@@ -189,7 +206,7 @@
         <?php echo $copyrightStatus->__toString() ?>
         <?php $params = $sf_data->getRaw('sf_request')->getGetParameters() ?>
         <?php unset($params['copyrightStatus']) ?>
-        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="icon-remove"></i></a>
+        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="fa fa-times"></i></a>
       </span>
     <?php endif; ?>
 
@@ -198,7 +215,7 @@
         <?php echo $materialType->__toString() ?>
         <?php $params = $sf_data->getRaw('sf_request')->getGetParameters() ?>
         <?php unset($params['materialType']) ?>
-        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="icon-remove"></i></a>
+        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="fa fa-times"></i></a>
       </span>
     <?php endif; ?>
 
@@ -211,7 +228,7 @@
         <?php endif; ?>
         <?php $params = $sf_data->getRaw('sf_request')->getGetParameters() ?>
         <?php unset($params['onlyMedia']) ?>
-        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="icon-remove"></i></a>
+        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="fa fa-times"></i></a>
       </span>
     <?php endif; ?>
 
@@ -220,7 +237,7 @@
         <?php echo __('Only top-level descriptions') ?>
         <?php $params = $sf_data->getRaw('sf_request')->getGetParameters() ?>
         <?php $params['topLod'] = 0 ?>
-        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="icon-remove"></i></a>
+        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="fa fa-times"></i></a>
       </span>
     <?php endif; ?>
 
@@ -229,7 +246,7 @@
         <?php echo ucfirst(sfCultureInfo::getInstance($sf_user->getCulture())->getLanguage($sf_request->languages)) ?>
         <?php $params = $sf_data->getRaw('sf_request')->getGetParameters() ?>
         <?php unset($params['languages']) ?>
-        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="icon-remove"></i></a>
+        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="fa fa-times"></i></a>
       </span>
     <?php endif; ?>
 
@@ -239,7 +256,7 @@
         <?php $params = $sf_data->getRaw('sf_request')->getGetParameters() ?>
         <?php unset($params['startDate']) ?>
         <?php unset($params['endDate']) ?>
-        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="icon-remove"></i></a>
+        <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params) ?>" class="remove-filter"><i class="fa fa-times"></i></a>
       </span>
     <?php endif; ?>
 
@@ -258,27 +275,27 @@
     'rangeType'    => $rangeType,
     'hiddenFields' => $hiddenFields)) ?>
 
-  <section class="browse-options">
-    <?php echo get_partial('default/printPreviewButton') ?>
+  <?php if (isset($pager) && $pager->hasResults()): ?>
 
-    <?php if (isset($pager) && $pager->hasResults() && $sf_user->isAuthenticated()): ?>
-      <a href="<?php echo url_for(array_merge($sf_data->getRaw('sf_request')->getParameterHolder()->getAll(), array('module' => 'informationobject', 'action' => 'exportCsv'))) ?>">
-        <i class="icon-upload-alt"></i>
-        <?php echo __('Export CSV') ?>
-      </a>
-    <?php endif; ?>
+    <section class="browse-options">
+      <?php echo get_partial('default/printPreviewButton') ?>
 
-    <?php echo get_partial('default/sortPicker', array(
-      'options' => array(
-        'lastUpdated' => __('Most recent'),
-        'alphabetic'  => __('Alphabetic'),
-        'identifier'  => __('Reference code'),
-        'date'        => __('Date')))) ?>
-  </section>
+      <?php if ($sf_user->isAuthenticated()): ?>
+        <a href="<?php echo url_for(array_merge($sf_data->getRaw('sf_request')->getParameterHolder()->getAll(), array('module' => 'informationobject', 'action' => 'exportCsv'))) ?>">
+          <i class="fa fa-upload"></i>
+          <?php echo __('Export CSV') ?>
+        </a>
+      <?php endif; ?>
 
-  <div id="content">
+      <?php echo get_partial('default/sortPicker', array(
+        'options' => array(
+          'lastUpdated' => __('Most recent'),
+          'alphabetic'  => __('Alphabetic'),
+          'identifier'  => __('Reference code'),
+          'date'        => __('Date')))) ?>
+    </section>
 
-    <?php if (isset($pager)): ?>
+    <div id="content">
 
       <?php if (!isset($sf_request->onlyMedia) && isset($pager->facets['digitalobjects']) && 0 < $pager->facets['digitalobjects']['count']): ?>
         <div class="search-result media-summary">
@@ -288,7 +305,7 @@
             <?php $params = $sf_data->getRaw('sf_request')->getGetParameters() ?>
             <?php unset($params['page']) ?>
             <a href="<?php echo url_for(array('module' => 'informationobject', 'action' => 'browse') + $params + array('onlyMedia' => true)) ?>">
-              <i class="icon-search"></i>
+              <i class="fa fa-search"></i>
               <?php echo __('Show results with digital objects') ?>
             </a>
           </p>
@@ -301,17 +318,19 @@
         <?php endforeach; ?>
       <?php else: ?>
         <section id="no-search-results">
-          <i class="icon-search"></i>
+          <i class="fa fa-search"></i>
           <p class="no-results-found"><?php echo __('No results found.') ?></p>
         </section>
       <?php endif; ?>
 
-    <?php endif; ?>
+    </div>
 
-  </div>
+  <?php endif; ?>
 
 <?php end_slot() ?>
 
-<?php slot('after-content') ?>
-  <?php echo get_partial('default/pager', array('pager' => $pager)) ?>
-<?php end_slot() ?>
+<?php if (isset($pager)): ?>
+  <?php slot('after-content') ?>
+    <?php echo get_partial('default/pager', array('pager' => $pager)) ?>
+  <?php end_slot() ?>
+<?php endif; ?>
